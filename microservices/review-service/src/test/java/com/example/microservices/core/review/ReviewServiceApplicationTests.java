@@ -15,7 +15,6 @@ class ReviewServiceApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
 	@Test
 	void getReviewsByProductId() {
 		int productId = 1;
