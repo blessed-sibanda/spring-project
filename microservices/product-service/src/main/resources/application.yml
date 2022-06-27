@@ -6,6 +6,8 @@ logging:
     root: INFO
     com.example: DEBUG
 
+spring.data.mongodb:
+  auto-index-creation: true
 ---
 spring.config.activate.on-profile: docker
 server.port: 8080
