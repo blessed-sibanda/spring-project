@@ -1,13 +1,17 @@
 server.port: 7001
 server.error.include-message: always
 
+spring.data.mongodb:
+  host: localhost
+  port: 27017
+  database: product-db
+  auto-index-creation: true
+
 logging:
   level:
     root: INFO
     com.example: DEBUG
-
-spring.data.mongodb:
-  auto-index-creation: true
+    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
 ---
 spring.config.activate.on-profile: docker
 server.port: 8080
