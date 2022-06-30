@@ -119,6 +119,11 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
     }
 
     @Override
+    public Review createReview(Review body) {
+        return null;
+    }
+
+    @Override
     public List<Review> getReviews(int productId) {
         try {
             String url = reviewServiceUrl + productId;
@@ -133,6 +138,11 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
             LOG.warn("Got an exception while requesting reviews, return zero reviews: {}", ex.getMessage());
             return new ArrayList<>();
         }
+    }
+
+    @Override
+    public void deleteReviews(int productId) {
+
     }
 
     private String getErrorMessage(HttpClientErrorException ex) {

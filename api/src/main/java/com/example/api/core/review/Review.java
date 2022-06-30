@@ -1,49 +1,75 @@
 package com.example.api.core.review;
 
 public class Review {
-  private final int productId;
-  private final int reviewId;
-  private final String author;
-  private final String subject;
-  private final String content;
-  private final String serviceAddress;
+    private int productId;
+    private int reviewId;
+    private String author;
+    private String subject;
+    private String content;
+    private String serviceAddress;
 
-  public Review(
-      int productId,
-      int reviewId,
-      String author,
-      String subject,
-      String content,
-      String serviceAddress) {
-    this.productId = productId;
-    this.reviewId = reviewId;
-    this.author = author;
-    this.subject = subject;
-    this.content = content;
-    this.serviceAddress = serviceAddress;
-  }
+    public Review() {}
 
-  public int getProductId() {
-    return productId;
-  }
+    public Review(
+            int productId,
+            int reviewId,
+            String author,
+            String subject,
+            String content,
+            String serviceAddress) {
+        this.productId = productId;
+        this.reviewId = reviewId;
+        this.author = author;
+        this.subject = subject;
+        this.content = content;
+        this.serviceAddress = serviceAddress;
+    }
 
-  public int getReviewId() {
-    return reviewId;
-  }
+    public int getProductId() {
+        return productId;
+    }
 
-  public String getAuthor() {
-    return author;
-  }
+    public void setProductId(int productId) {
+        this.productId = productId;
+    }
 
-  public String getSubject() {
-    return subject;
-  }
+    public int getReviewId() {
+        return reviewId;
+    }
 
-  public String getContent() {
-    return content;
-  }
+    public void setReviewId(int reviewId) {
+        this.reviewId = reviewId;
+    }
 
-  public String getServiceAddress() {
-    return serviceAddress;
-  }
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public String getServiceAddress() {
+        return serviceAddress;
+    }
+
+    public void setServiceAddress(String serviceAddress) {
+        this.serviceAddress = serviceAddress;
+    }
 }

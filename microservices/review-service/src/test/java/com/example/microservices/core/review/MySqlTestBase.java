@@ -4,7 +4,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.MySQLContainer;
 
-public class MySqlTestBase {
+public abstract class MySqlTestBase {
     private static final MySQLContainer database =
             new MySQLContainer("mysql:5.7.32");
 
