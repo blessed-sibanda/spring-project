@@ -11,7 +11,9 @@ logging:
   level:
     root: INFO
     com.example: DEBUG
+    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
 
 ---
 spring.config.activate.on-profile: docker
 server.port: 8080
+spring.data.mongodb.host: mongodb
