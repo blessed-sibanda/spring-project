@@ -3,6 +3,7 @@ springdoc:
   api-docs.path: /openapi/v3/api-docs
   packagesToScan: com.example.microservices.composite.product
   pathsToMatch: /**
+  api-docs.version: openapi_3_0
 
 api:
 
@@ -17,9 +18,9 @@ api:
     externalDocDesc: MY WIKI PAGE
     externalDocUrl: MY WIKI URL
     contact:
-      name: NAME OF CONTACT
+      name: Blessed Sibanda
       url: URL TO CONTACT
-      email: contact@email.com
+      email: blessedsibanda.me@gmail.com
 
   responseCodes:
     ok.description: OK
@@ -28,6 +29,28 @@ api:
     unprocessableEntity.description: Unprocessable entity, input parameters cause the processing to fail. See response message for more information
 
   product-composite:
+    create-composite-product:
+      description: Creates a composite product
+      notes: |
+        # Normal response
+        The composite product information to the API will be split up and 
+        stored as separate product-info, recommendation and review entities.
+        
+        # Expected error responses
+        1. If a product with the same produtId as specified in the 
+        posted information already exists, an **422** - Unprocessable
+        Entity** error with a "duplicate key" error message will be 
+        Returned
+    delete-composite-product:
+      description: Deletes a product composite
+      notes: |
+        # Normal response
+        Entities for product information, recommendation and reviews related
+        to the specified productId will be deleted.
+        The implementation of the delete method is idempotent, i.e. it can
+        be called several times with the same response.
+        This means that a delete request of a non-existing product will return 
+        **200 Ok**
     get-composite-product:
       description: Return a composite view of the specified product id
       notes: |

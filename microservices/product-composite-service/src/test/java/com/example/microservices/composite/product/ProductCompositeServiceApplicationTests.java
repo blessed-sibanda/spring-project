@@ -1,5 +1,8 @@
 package com.example.microservices.composite.product;
 
+import com.example.api.composite.product.ProductAggregate;
+import com.example.api.composite.product.RecommendationSummary;
+import com.example.api.composite.product.ReviewSummary;
 import com.example.api.core.product.Product;
 import com.example.api.core.recommendation.Recommendation;
 import com.example.api.core.review.Review;
@@ -15,6 +18,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 
@@ -93,6 +97,61 @@ class ProductCompositeServiceApplicationTests {
 				.expectBody()
 				.jsonPath("$.path").isEqualTo("/product-composite/" + PRODUCT_ID_INVALID)
 				.jsonPath("$.message").isEqualTo("INVALID: " + PRODUCT_ID_INVALID);
+	}
+
+	@Test
+	void createCompositeProduct() {
+		ProductAggregate compositeProduct = new ProductAggregate(
+				1, "name", 1, null, null, null
+		);
+		postAndVerifyProduct(compositeProduct, HttpStatus.OK);
+	}
+
+	@Test
+	void createCompositeProduct2() {
+		ProductAggregate compositeProduct = new ProductAggregate(1, "name",
+				1, Collections.singletonList(new RecommendationSummary(1, "a", 1, "c")),
+				Collections.singletonList(new ReviewSummary(1,"a", "s", "c")),
+				null);
+		postAndVerifyProduct(compositeProduct, HttpStatus.OK);
+	}
+
+	@Test
+	void deleteCompositeProduct() {
+		ProductAggregate compositeProduct = new ProductAggregate(1, "name",
+				1,Collections.singletonList(new RecommendationSummary(1, "a", 1, "c")),
+				Collections.singletonList(new ReviewSummary(1, "a", "s", "c")), null);
+		postAndVerifyProduct(compositeProduct, HttpStatus.OK);
+		deleteAndVerifyProduct(compositeProduct.getProductId(), HttpStatus.OK);
+		deleteAndVerifyProduct(compositeProduct.getProductId(), HttpStatus.OK);
+	}
+
+	private WebTestClient.BodyContentSpec getAndVerifyProduct(
+			int productId, HttpStatus expectedStatus
+	) {
+		return client.get()
+				.uri("/product-composite/" + productId)
+				.accept(MediaType.APPLICATION_JSON)
+				.exchange()
+				.expectStatus().isEqualTo(expectedStatus)
+				.expectHeader().contentType(MediaType.APPLICATION_JSON)
+				.expectBody();
+	}
+
+	private void postAndVerifyProduct(ProductAggregate compositeProduct,
+									  HttpStatus expectedStatus) {
+		client.post()
+				.uri("/product-composite")
+				.body(Mono.just(compositeProduct), ProductAggregate.class)
+				.exchange()
+				.expectStatus().isEqualTo(expectedStatus);
+	}
+
+	private void deleteAndVerifyProduct(int productId, HttpStatus expectedStatus) {
+		client.delete()
+				.uri("/product-composite/" + productId)
+				.exchange()
+				.expectStatus().isEqualTo(expectedStatus);
 	}
 
 }
