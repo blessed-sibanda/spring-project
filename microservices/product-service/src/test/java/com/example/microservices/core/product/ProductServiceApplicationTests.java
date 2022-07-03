@@ -23,14 +23,17 @@ class ProductServiceApplicationTests extends MongoDbTestBase {
 
     @BeforeEach
     void setupDb() {
-        repository.deleteAll();
+        repository.deleteAll().block();
     }
 
     @Test
     void getProductById() {
         int productId = 1;
+		assertNull(repository.findByProductId(productId).block());
+		assertEquals(0, (long)repository.count().block());
 		postAndVerifyProduct(productId, HttpStatus.OK);
-		assertTrue(repository.findByProductId(productId).isPresent());
+		assertNotNull(repository.findByProductId(productId).block());
+		assertEquals(1, (long)repository.count().block());
 		getAndVerifyProduct(productId, HttpStatus.OK)
 				.jsonPath("$.productId").isEqualTo(productId);
     }
@@ -38,8 +41,9 @@ class ProductServiceApplicationTests extends MongoDbTestBase {
 	@Test
 	void duplicateError() {
 		int productId = 1;
+		assertNull(repository.findByProductId(productId).block());
 		postAndVerifyProduct(productId, HttpStatus.OK);
-		assertTrue(repository.findByProductId(productId).isPresent());
+		assertNotNull(repository.findByProductId(productId).block());
 		postAndVerifyProduct(productId, HttpStatus.UNPROCESSABLE_ENTITY)
 				.jsonPath("$.path").isEqualTo("/product")
 				.jsonPath("$.message").isEqualTo("Duplicate key, Product Id: " + productId);
@@ -49,10 +53,9 @@ class ProductServiceApplicationTests extends MongoDbTestBase {
 	void deleteProduct() {
 		int productId = 1;
 		postAndVerifyProduct(productId, HttpStatus.OK);
-		assertTrue(repository.findByProductId(productId).isPresent());
-
+		assertNotNull(repository.findByProductId(productId).block());
 		deleteAndVerifyProduct(productId, HttpStatus.OK);
-		assertFalse(repository.findByProductId(productId).isPresent());
+		assertNull(repository.findByProductId(productId).block());
 
 		deleteAndVerifyProduct(productId, HttpStatus.OK);
 	}
