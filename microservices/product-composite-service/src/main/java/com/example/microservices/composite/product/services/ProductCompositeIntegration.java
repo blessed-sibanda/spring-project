@@ -19,10 +19,14 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 @Component
 public class ProductCompositeIntegration implements ProductService, RecommendationService, ReviewService {
@@ -32,6 +36,8 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
     private final String productServiceUrl;
     private final String recommendationServiceUrl;
     private final String reviewServiceUrl;
+
+    private final WebClient webClient;
 
     @Autowired
     public ProductCompositeIntegration(
@@ -54,32 +60,17 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
     }
 
     @Override
-    public Product getProduct(int productId) {
-        try {
-            String url = productServiceUrl + productId;
-            LOG.debug("Will call getProduct API on URL: {}", url);
-            Product product = restTemplate.getForObject(url, Product.class);
-            assert product != null;
-            LOG.debug("Found a product with id: {}", product.getProductId());
-            return product;
-        } catch (HttpClientErrorException ex) {
-            switch (ex.getStatusCode()) {
-                case NOT_FOUND:
-                    throw new NotFoundException(getErrorMessage(ex));
-                case UNPROCESSABLE_ENTITY:
-                    throw new InvalidInputException(getErrorMessage(ex));
-                default:
-                    LOG.warn("Got an unexpected HTTP error; {}, will rethrow it",
-                            ex.getStatusCode());
-                    LOG.warn("Error body: {}", ex.getResponseBodyAsString());
-                    throw ex;
-            }
-        }
-
+    public Mono<Product> getProduct(int productId) {
+        String url = productServiceUrl + productId;
+        return webClient.get().uri(url).retrieve()
+                .bodyToMono(Product.class)
+                .log(LOG.getName(), Level.FINE)
+                .onErrorMap(WebClientResponseException.class,
+                        ex -> handleException(ex));
     }
 
     @Override
-    public Product createProduct(Product body) {
+    public Mono<Product> createProduct(Product body) {
         try {
             return restTemplate.postForObject(
                     productServiceUrl, body, Product.class
@@ -187,7 +178,7 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
         }
     }
 
-    private String getErrorMessage(HttpClientErrorException ex) {
+    private String getErrorMessage(WebClientResponseException ex) {
         try {
             return mapper.readValue(ex.getResponseBodyAsString(), HttpErrorInfo.class).getMessage();
         } catch (IOException ioex) {
@@ -195,17 +186,22 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
         }
     }
 
-    private RuntimeException handleHttpClientException(HttpClientErrorException ex) {
-        switch (ex.getStatusCode()) {
+    private Throwable handleException(Throwable ex) {
+        if (!(ex instanceof WebClientResponseException)) {
+            LOG.warn("Got an unexpected error: {}, will rethrow it", ex.toString());
+            return ex;
+        }
+        WebClientResponseException wcre = (WebClientResponseException) ex;
+        switch (wcre.getStatusCode()) {
             case NOT_FOUND:
-                return new NotFoundException(getErrorMessage(ex));
+                throw new NotFoundException(getErrorMessage(wcre));
             case UNPROCESSABLE_ENTITY:
-                return new InvalidInputException(getErrorMessage(ex));
+                throw new InvalidInputException(getErrorMessage(wcre));
             default:
-                LOG.warn("Got an unexpected HTTP error: {}, will rethrow it",
-                        ex.getStatusCode());
-                LOG.warn("Error body: {}", ex.getResponseBodyAsString());
-                return ex;
+                LOG.warn("Got an unexpected HTTP error; {}, will rethrow it",
+                        wcre.getStatusCode());
+                LOG.warn("Error body: {}", wcre.getResponseBodyAsString());
+                throw wcre;
         }
     }
 }
