@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.health.Health;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
@@ -52,10 +53,10 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
             @Value("${app.recommendation-service.port}") int recommendationServicePort,
             @Value("${app.review-service.host}") String reviewServiceHost,
             @Value("${app.review-service.port}") int reviewServicePort) {
-        this.publishEventScheduler=publishEventScheduler;
+        this.publishEventScheduler = publishEventScheduler;
         this.webClient = webClient.build();
         this.mapper = mapper;
-        this.streamBridge=streamBridge;
+        this.streamBridge = streamBridge;
         productServiceUrl = "http://" + productServiceHost + ":" +
                 productServicePort + "/product/";
         recommendationServiceUrl = "http://" + recommendationServiceHost + ":" +
@@ -86,7 +87,7 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
     @Override
     public Mono<Void> deleteProduct(int productId) {
         return Mono.fromRunnable(() -> sendMessage("products-out-0",
-                new Event(Event.Type.DELETE, productId,null)))
+                        new Event(Event.Type.DELETE, productId, null)))
                 .subscribeOn(publishEventScheduler).then();
     }
 
@@ -112,8 +113,8 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
     @Override
     public Mono<Void> deleteRecommendations(int productId) {
         return Mono.fromRunnable(() ->
-                sendMessage("recommendations-out-0",
-                        new Event(Event.Type.DELETE, productId, null)))
+                        sendMessage("recommendations-out-0",
+                                new Event(Event.Type.DELETE, productId, null)))
                 .subscribeOn(publishEventScheduler).then();
     }
 
@@ -137,10 +138,21 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
 
     @Override
     public Mono<Void> deleteReviews(int productId) {
-        return Mono.fromRunnable(()-> {
+        return Mono.fromRunnable(() -> {
             sendMessage("reviews-out-0",
                     new Event(Event.Type.DELETE, productId, null));
         }).subscribeOn(publishEventScheduler).then();
+    }
+
+    public Mono<Health> getProductHealth() {
+        return getHealth(productServiceUrl);
+    }
+
+    public Mono<Health> getRecommendationHealth() {
+        return getHealth(recommendationServiceUrl);
+    }
+    public Mono<Health> getReviewHealth() {
+        return getHealth(reviewServiceUrl);
     }
 
     private String getErrorMessage(WebClientResponseException ex) {
@@ -175,5 +187,16 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
         Message message = MessageBuilder.withPayload(event)
                 .setHeader("partitionKey", event.getKey()).build();
         streamBridge.send(bindingName, message);
+    }
+
+    private Mono<Health> getHealth(String url) {
+        url += "/actuator/health";
+        LOG.debug("Will call the Health API on URL: {}", url);
+        return webClient.get().uri(url).retrieve().bodyToMono(String.class)
+                .map(s -> new Health.Builder().up().build())
+                .onErrorResume(ex -> Mono.just(
+                        new Health.Builder().down(ex).build()
+                ))
+                .log(LOG.getName(), Level.FINE);
     }
 }

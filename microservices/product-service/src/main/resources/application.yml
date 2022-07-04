@@ -1,6 +1,9 @@
 server.port: 7001
 server.error.include-message: always
 
+management.endpoint.health.show-details: "ALWAYS"
+management.endpoints.web.exposure.include: "*"
+
 spring.data.mongodb:
   host: localhost
   port: 27017
