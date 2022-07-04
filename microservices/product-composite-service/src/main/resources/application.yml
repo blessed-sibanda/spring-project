@@ -1,6 +1,23 @@
-spring.cloud.stream.bindings.products-out-0.producer:
-  partition-key-expression: headers['partitionKey']
-  partition-count: 2
+spring.cloud.stream:
+  defaultBinder: rabbit
+  default.contentType: application/json
+  bindings:
+    products-out-0:
+      destination: products
+    recommendations-out-0:
+      destination: recommendations
+    reviews-out-0:
+      destination: reviews
+
+spring.cloud.stream.kafka.binder:
+  brokers: 127.0.0.1
+  defaultBrokerPort: 9092
+
+spring.rabbitmq:
+  host: 127.0.0.1
+  port: 5672
+  username: guest
+  password: guest
 
 springdoc:
   swagger-ui.path: /openapi/swagger-ui.html
