@@ -140,3 +140,4 @@ app:
     host: review
     port: 8080
 
+spring.rabbitmq.host: rabbitmq

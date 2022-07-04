@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,6 +19,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.function.Consumer;
 
+
+@AutoConfigureWebTestClient(timeout = "36000")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ProductServiceApplicationTests extends MongoDbTestBase {
     @Autowired
@@ -39,10 +42,10 @@ class ProductServiceApplicationTests extends MongoDbTestBase {
     void getProductById() {
         int productId = 1;
         assertNull(repository.findByProductId(productId).block());
-        assertEquals(0, (long) repository.count().block());
+        assertEquals(0, repository.count().block());
         sendCreateProductEvent(productId);
         assertNotNull(repository.findByProductId(productId).block());
-        assertEquals(1, (long) repository.count().block());
+        assertEquals(1, repository.count().block());
         getAndVerifyProduct(productId, HttpStatus.OK)
                 .jsonPath("$.productId").isEqualTo(productId);
     }

@@ -58,16 +58,16 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
         this.mapper = mapper;
         this.streamBridge = streamBridge;
         productServiceUrl = "http://" + productServiceHost + ":" +
-                productServicePort + "/product/";
+                productServicePort;
         recommendationServiceUrl = "http://" + recommendationServiceHost + ":" +
-                recommendationServicePort + "/recommendation?productId=";
+                recommendationServicePort;
         reviewServiceUrl = "http://" + reviewServiceHost + ":" +
-                reviewServicePort + "/reviews?productId=";
+                reviewServicePort;
     }
 
     @Override
     public Mono<Product> getProduct(int productId) {
-        String url = productServiceUrl + productId;
+        String url = productServiceUrl + "/product/" + productId;
         return webClient.get().uri(url).retrieve()
                 .bodyToMono(Product.class)
                 .log(LOG.getName(), Level.FINE)
@@ -93,7 +93,7 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
 
     @Override
     public Flux<Recommendation> getRecommendations(int productId) {
-        String url = recommendationServiceUrl + productId;
+        String url = recommendationServiceUrl + "/recommendation?productId=" + productId;
         LOG.debug("Will call getRecommendations API on URL: {}", url);
         // Return an empty result if something goes wrong to make it possible for
         // the composite service to return partial responses
@@ -128,7 +128,7 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
 
     @Override
     public Flux<Review> getReviews(int productId) {
-        String url = reviewServiceUrl + productId;
+        String url = reviewServiceUrl + "/review?productId=" + productId;
         LOG.debug("Will call getReviews API on URL: {}", url);
         // Return an empty result if something goes wrong to make it possible
         // for the composite service to return partial responses
