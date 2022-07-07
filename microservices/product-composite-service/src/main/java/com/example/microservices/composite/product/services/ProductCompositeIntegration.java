@@ -171,14 +171,14 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
         WebClientResponseException wcre = (WebClientResponseException) ex;
         switch (wcre.getStatusCode()) {
             case NOT_FOUND:
-                throw new NotFoundException(getErrorMessage(wcre));
+                return new NotFoundException(getErrorMessage(wcre));
             case UNPROCESSABLE_ENTITY:
-                throw new InvalidInputException(getErrorMessage(wcre));
+                return new InvalidInputException(getErrorMessage(wcre));
             default:
                 LOG.warn("Got an unexpected HTTP error; {}, will rethrow it",
                         wcre.getStatusCode());
                 LOG.warn("Error body: {}", wcre.getResponseBodyAsString());
-                throw wcre;
+                return ex;
         }
     }
 
