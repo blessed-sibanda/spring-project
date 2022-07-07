@@ -21,7 +21,8 @@ import java.util.function.Consumer;
 
 
 @AutoConfigureWebTestClient(timeout = "36000")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+properties = {"eureka.client.enabled=false"})
 class ProductServiceApplicationTests extends MongoDbTestBase {
     @Autowired
     @Qualifier("messageProcessor")

@@ -19,7 +19,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.function.Consumer;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+		properties = {"eureka.client.enabled=false"})
 class RecommendationServiceApplicationTests extends MongoDbTestBase {
 	@Autowired
 	private WebTestClient client;

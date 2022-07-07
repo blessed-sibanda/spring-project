@@ -20,7 +20,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+		properties = {"eureka.client.enabled=false"})
 class ProductCompositeServiceApplicationTests {
 	private static final int PRODUCT_ID_OK = 1;
 	private static final int PRODUCT_ID_NOT_FOUND = 2;
