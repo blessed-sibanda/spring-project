@@ -38,6 +38,9 @@ public class ProductServiceImpl implements ProductService {
         if (productId < 1) {
             throw new InvalidInputException("Invalid productId: " + productId);
         }
+
+        LOG.info("Will get product info for id={}", productId);
+        
         return repository.findByProductId(productId)
                 .switchIfEmpty(Mono.error(
                         new NotFoundException("No product found for productId: " + productId)))

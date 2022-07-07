@@ -34,6 +34,7 @@ public class ProductCompositeServiceImpl implements ProductCompositeService {
 
     @Override
     public Mono<ProductAggregate> getProduct(int productId) {
+        LOG.info("Will get composite product info for product.id={}", productId);
         return Mono.zip(
                         values -> createProductAggregate(
                                 (Product) values[0],

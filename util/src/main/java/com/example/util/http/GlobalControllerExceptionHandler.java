@@ -1,5 +1,6 @@
 package com.example.util.http;
 
+import com.example.api.exceptions.BadRequestException;
 import com.example.api.exceptions.InvalidInputException;
 import com.example.api.exceptions.NotFoundException;
 import org.slf4j.Logger;
@@ -30,6 +31,14 @@ public class GlobalControllerExceptionHandler {
             ServerHttpRequest request, InvalidInputException ex
     ) {
        return createHttpErrorInfo(HttpStatus.UNPROCESSABLE_ENTITY, request, ex);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BadRequestException.class)
+    public @ResponseBody HttpErrorInfo handleBadRequestException(
+            ServerHttpRequest request, BadRequestException ex
+    ) {
+        return createHttpErrorInfo(HttpStatus.BAD_REQUEST, request, ex);
     }
 
     private HttpErrorInfo createHttpErrorInfo(
