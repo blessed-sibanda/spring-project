@@ -7,4 +7,5 @@ include ':microservices:product-composite-service'
 include 'util:src'
 findProject(':util:src')?.name = 'src'
 include 'util'
+include ':spring-cloud:eureka-server'
 
