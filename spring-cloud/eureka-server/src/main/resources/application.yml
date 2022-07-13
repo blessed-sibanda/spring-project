@@ -12,4 +12,8 @@ eureka:
     waitTimeInMsWhenSyncEmpty: 0
     response-cache-update-interval-ms: 5000
 
+app:
+  eureka-username: u
+  eureka-password: p
+
 management.endpoints.web.exposure.include: "*"
