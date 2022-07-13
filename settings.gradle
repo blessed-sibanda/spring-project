@@ -8,4 +8,5 @@ include 'util:src'
 findProject(':util:src')?.name = 'src'
 include 'util'
 include ':spring-cloud:eureka-server'
+include ':spring-cloud:gateway'
 
